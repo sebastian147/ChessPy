@@ -3,6 +3,9 @@ import pygame
 from Tablero.Tablero import Tablero
 from Piezas.Nopieza import Nopieza
 
+from tkinter import *
+from tkinter import messagebox
+
 
 pygame.init()
 gameDisplay = pygame.display.set_mode((800, 800))
@@ -76,6 +79,9 @@ mx,my = 0,0
 selectedImage = None
 Turno = "Blanca"
 Moviendo = False
+FlagEndGame = False
+Reiniciar = False
+MoveDone = 0
 while not quitGame:
 
     for event in pygame.event.get():
@@ -117,6 +123,9 @@ while not quitGame:
                           if allPieces[selectedImage][1][0]-50 < x * 100 < allPieces[selectedImage][1][0] + 50:
                               if TableroDeAjedres.CasillasDeJuego[sx/100, sy/100].pieceOnTile.MoviemientoValido([x, y],TableroDeAjedres.CasillasDeJuego ):
                                 if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() != "-":
+                                    if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "R" or TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "r":
+                                        FlagEndGame = True
+                                        #agregar flag de jaque
                                     for i in range(len(allPieces)):
                                         if allPieces[i][1][0] == x*100 and allPieces[i][1][1] == y*100:
                                             print("BOrrado")
@@ -155,6 +164,27 @@ while not quitGame:
 
             selectedImage = None
 
+    if FlagEndGame:
+        if MoveDone == 2:
+            Tk().wm_withdraw()
+            Reiniciar = messagebox.askyesno("Perdio", "Desea Reiniciar el Juego")
+
+            print("HOLA")
+            if Reiniciar:
+                    Reiniciar = False
+                    for i in range(len(allPieces)):
+                        allPieces.pop(-1)
+                    TableroDeAjedres = Tablero()
+                    TableroDeAjedres.CrearTablero()
+                    TableroDeAjedres.ImpimirTablero()
+                    drawChessPieces()
+                    FlagEndGame = False
+            else:
+                quitGame = True
+                pygame.quit()
+                quit()
+        else:
+            MoveDone += 1
 
     for xy in range(64):
         squares(cuadrados[xy][0], cuadrados[xy][1], cuadrados[xy][2], cuadrados[xy][3], cuadrados[xy][4])
