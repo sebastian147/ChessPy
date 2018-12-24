@@ -54,8 +54,7 @@ class Rey (Pieza):
     def Enroque(self, position, piezas):
         if self.FlagNoMove:#falta verificar el no jaque
             if self.alliance == "Negra":
-                if position == [2,0] and self.xNoPieza and piezas[0, 0].pieceOnTile.FlagNoMove and piezas[1,0].pieceOnTile.toString() == "-":
-
+                if position == [2,0] and self.xNoPieza and piezas[0, 0].pieceOnTile.FlagNoMove and piezas[1,0].pieceOnTile.toString() == "-" and self.Verificar_piezas_Enroque([0, 1, 2, 3, 4], 0, piezas):
                     del piezas[(0, 0)]
                     del piezas[(3,0)]
                     piezas[(3,0)] = Casillas([3,0], Torre(self.alliance, [3,0]))
@@ -63,7 +62,7 @@ class Rey (Pieza):
                     piezas[(0,0)] = Casillas([0,0], Nopieza())
                     self.enroqueDone = True
                     return True
-                elif position == [6,0] and self.xNoPieza and piezas[7,0].pieceOnTile.FlagNoMove:
+                elif position == [6,0] and self.xNoPieza and piezas[7,0].pieceOnTile.FlagNoMove and self.Verificar_piezas_Enroque([4, 5, 6, 7], 0, piezas):
 
                     del piezas[(7, 0)]
                     del piezas[(5,0)]
@@ -75,7 +74,7 @@ class Rey (Pieza):
                 else:
                     return False
             else:
-                if position == [2,7] and self.xNoPieza and piezas[0,7].pieceOnTile.FlagNoMove and piezas[1, 7].pieceOnTile.toString() == "-":
+                if position == [2,7] and self.xNoPieza and piezas[0,7].pieceOnTile.FlagNoMove and piezas[1, 7].pieceOnTile.toString() == "-" and self.Verificar_piezas_Enroque([0, 1, 2, 3, 4], 7, piezas):
                     self.FlagNoMove = False
 
                     del piezas[(0, 7)]
@@ -85,7 +84,7 @@ class Rey (Pieza):
                     piezas[(0,7)] = Casillas([0,7], Nopieza())
                     self.enroqueDone = True
                     return True
-                elif position == [6, 7] and self.xNoPieza and piezas[7, 7].pieceOnTile.FlagNoMove:
+                elif position == [6, 7] and self.xNoPieza and piezas[7, 7].pieceOnTile.FlagNoMove and self.Verificar_piezas_Enroque([4, 5, 6, 7], 7, piezas):
                     self.FlagNoMove = False
                     del piezas[(7, 7)]
                     del piezas[(5,7)]
@@ -132,4 +131,12 @@ class Rey (Pieza):
                             img = pygame.image.load("./Imagenes/T" + self.alliance[0] + ".png")
                             img = pygame.transform.scale(img, (100, 100))
                             allPieces.insert(i, [img, [5 * 100, 7 * 100], Torre(self.alliance, [5, 7])])
+    def Verificar_piezas_Enroque(self, dx, dy, piezas):
+        for x in range(8):
+            for y in range(8):
+                for xt in dx:
+                    if piezas[x, y].pieceOnTile.alliance != self.alliance:
+                        if piezas[x, y].pieceOnTile.MoviemientoValido([xt, dy], piezas):
+                            return False
+        return True
 
