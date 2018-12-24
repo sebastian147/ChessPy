@@ -8,5 +8,3 @@ class Nopieza(Pieza):
         pass ##??
     def toString(self):
         return "-"
-    def MoviemientoValido(self, position, pieza):
-        return False

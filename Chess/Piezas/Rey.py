@@ -1,18 +1,19 @@
 from Piezas.Pieza import Pieza
+from Tablero.Casillas import Casillas
+from Piezas.Torre import Torre
+from Piezas.Nopieza import Nopieza
+import pygame
 
 class Rey (Pieza):
-    alliance = None
-    position = None
-    xNoPieza = False
-    yNoPieza = False
-    NoPieza = False
+    enroqueDone = False
 
     def __init__(self, alliance, position):
         self.alliance = alliance
         self.position = position
+        self.FlagNoMove = True
     def toString(self):
         return "R" if self.alliance == "Negra" else "r"
-    # def MoviemientoValido(self, position, piezas):
+    # def MoviemientoValido(self, position,self.position piezas):
     #     self.xNoPieza, self.yNoPieza = self.Pieza(piezas, position)
     #     if(self.position == position):
     #         self.valido = False
@@ -40,76 +41,95 @@ class Rey (Pieza):
             self.valido = False
         elif abs(self.position[0] - position[0]) == 1 and 1 >= abs(self.position[1] - position[1]) and (self.xNoPieza or self.yNoPieza) and self.NoPieza:
             self.valido = True
+            self.FlagNoMove = False
         elif abs(self.position[0] - position[0]) <= 1 and 1 == abs(self.position[1] - position[1]) and (self.xNoPieza or self.yNoPieza) and self.NoPieza:
             self.valido = True
+            self.FlagNoMove = False
         else:
             self.valido = False
+        if self.valido == False:
+            self.valido = self.Enroque(position, piezas)
         return self.valido
 
-    def PiezaT(self, piezas, position):
-        Flagx, Flagy = True, True
-        finalx, finaly = position
-        if self.position[0] < position[0]:
-            distancex = range(int(self.position[0])+1, int(position[0])+1)
-        else:
-            distancex = range(int(position[0]), int(self.position[0]))
-        if self.position[1] < position[1]:
-            distancey = range(int(self.position[1]+1), int(position[1])+1)
-        else:
-            distancey = range(int(position[1]), int(self.position[1]))
-        for x in distancex:
-            print(x)
-            if piezas[x, self.position[1]].pieceOnTile.toString() != "-":
-                self.xNoPieza = False
-                if piezas[x, self.position[1]].pieceOnTile.alliance != self.alliance and finalx == x and Flagx:
-                    self.xNoPieza = True
-                    self.yNoPieza = False
-                Flagx = False
-            elif Flagx:
-                self.xNoPieza = True
-        for y in distancey:
-            print(y)
-            if piezas[self.position[0], y].pieceOnTile.toString() != "-":
-                self.yNoPieza = False
-                if piezas[self.position[0], y].pieceOnTile.alliance != self.alliance and finaly == y and Flagy:
-                    self.yNoPieza = True
-                    self.xNopieza = False
-                Flagy = False
-            elif Flagy:
-                self.yNoPieza = True
-        return self.xNoPieza, self.yNoPieza
+    def Enroque(self, position, piezas):
+        if self.FlagNoMove:#falta verificar el no jaque
+            if self.alliance == "Negra":
+                if position == [2,0] and self.xNoPieza and piezas[0, 0].pieceOnTile.FlagNoMove and piezas[1,0].pieceOnTile.toString() == "-":
 
-    def PiezaA(self, piezas, position):
-        Flag = True
-        FlagF = True
-        finalx, finaly = position
-        if self.position[0] < position[0]:
-            distancex = range(int(self.position[0]+1), int(position[0])+1)
-        else:
-            distancex = range(int(position[0]), int(self.position[0]))
-        if self.position[1] < position[1]:
-            distancey = range(int(self.position[1]+1), int(position[1])+1)
-        else:
-            distancey = range(int(position[1]), int(self.position[1]))
-        if (self.position[0] < position[0] and self.position[1] < self.position[1]) or (position[0] > self.position[0] and position[1] > self.position[1]):
-            neg = 1
-            y = 0
-        else:
-            neg = -1
-            y = 1
+                    del piezas[(0, 0)]
+                    del piezas[(3,0)]
+                    piezas[(3,0)] = Casillas([3,0], Torre(self.alliance, [3,0]))
+                    piezas[3, 0].pieceOnTile.FlagNoMove = False
+                    piezas[(0,0)] = Casillas([0,0], Nopieza())
+                    self.enroqueDone = True
+                    return True
+                elif position == [6,0] and self.xNoPieza and piezas[7,0].pieceOnTile.FlagNoMove:
 
-        for x in distancex:
-            print(x, distancey[neg*y])
-            if piezas[x, distancey[neg*y]].pieceOnTile.toString() != "-":
-                self.NoPieza = False
-                if piezas[x, distancey[neg*y]].pieceOnTile.alliance != self.alliance and (finalx == x or distancey[neg*y] == finaly) and Flag:
-                    self.NoPieza = True
-                    FlagF = False
-                if FlagF:
-                    Flag = False
+                    del piezas[(7, 0)]
+                    del piezas[(5,0)]
+                    piezas[(5,0)] = Casillas([5,0], Torre(self.alliance, [5,0]))
+                    piezas[5, 0].pieceOnTile.FlagNoMove = False
+                    piezas[(7,0)] = Casillas([7,0], Nopieza())
+                    self.enroqueDone = True
+                    return True
                 else:
-                    FlagF = True #posible bug
-            elif Flag:
-                self.NoPieza = True
-            y += 1
-        return self.NoPieza
+                    return False
+            else:
+                if position == [2,7] and self.xNoPieza and piezas[0,7].pieceOnTile.FlagNoMove and piezas[1, 7].pieceOnTile.toString() == "-":
+                    self.FlagNoMove = False
+
+                    del piezas[(0, 7)]
+                    del piezas[(3,7)]
+                    piezas[(3,7)] = Casillas([3,7], Torre(self.alliance, [3,7]))
+                    piezas[3, 7].pieceOnTile.FlagNoMove = False
+                    piezas[(0,7)] = Casillas([0,7], Nopieza())
+                    self.enroqueDone = True
+                    return True
+                elif position == [6, 7] and self.xNoPieza and piezas[7, 7].pieceOnTile.FlagNoMove:
+                    self.FlagNoMove = False
+                    del piezas[(7, 7)]
+                    del piezas[(5,7)]
+                    piezas[(5,7)] = Casillas([5,7], Torre(self.alliance, [5,7]))
+                    piezas[5, 7].pieceOnTile.FlagNoMove = False
+                    piezas[(7,7)] = Casillas([7,7], Nopieza())
+                    self.enroqueDone = True
+                    return True
+                else:
+                    return False
+        else:
+            return False
+    def ActualizarTorre(self, position, allPieces):
+        if self.enroqueDone:
+
+            if self.alliance == "Negra":
+                if position == [2,0] :
+                    for i in range(len(allPieces)):
+                        if 0 == int((allPieces[i][1][0]) / 100) and int((allPieces[i][1][1]) / 100) == 0:
+                            allPieces.pop(i)
+                            img = pygame.image.load("./Imagenes/T" + self.alliance[0] + ".png")
+                            img = pygame.transform.scale(img, (100, 100))
+                            allPieces.insert(i, [img, [3 * 100, 0 * 100], Torre(self.alliance, [3,0])])
+                elif position == [6,0]:
+
+                    for i in range(len(allPieces)):
+                        if 7 == int((allPieces[i][1][0]) / 100) and int((allPieces[i][1][1]) / 100) == 0:
+                            allPieces.pop(i)
+                            img = pygame.image.load("./Imagenes/T" + self.alliance[0] + ".png")
+                            img = pygame.transform.scale(img, (100, 100))
+                            allPieces.insert(i, [img, [5 * 100, 0 * 100],Torre(self.alliance, [5,0])])
+            else:
+                if position == [2,7]:
+                    for i in range(len(allPieces)):
+                        if 0 == int((allPieces[i][1][0]) / 100) and int((allPieces[i][1][1]) / 100) == 7:
+                            allPieces.pop(i)
+                            img = pygame.image.load("./Imagenes/T" + self.alliance[0] + ".png")
+                            img = pygame.transform.scale(img, (100, 100))
+                            allPieces.insert(i, [img, [3 * 100, 7 * 100], Torre(self.alliance, [3, 7])])
+                elif position == [6, 7]:
+                    for i in range(len(allPieces)):
+                        if 7 == int((allPieces[i][1][0]) / 100) and int((allPieces[i][1][1]) / 100) == 7:
+                            allPieces.pop(i)
+                            img = pygame.image.load("./Imagenes/T" + self.alliance[0] + ".png")
+                            img = pygame.transform.scale(img, (100, 100))
+                            allPieces.insert(i, [img, [5 * 100, 7 * 100], Torre(self.alliance, [5, 7])])
+

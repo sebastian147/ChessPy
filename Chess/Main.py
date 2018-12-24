@@ -82,6 +82,7 @@ Moviendo = False
 FlagEndGame = False
 Reiniciar = False
 MoveDone = 0
+jaque = False
 while not quitGame:
 
     for event in pygame.event.get():
@@ -121,14 +122,14 @@ while not quitGame:
                    if allPieces[selectedImage][1][1]-50 < y*100 < allPieces[selectedImage][1][1]+50:
                        for x in range(8):
                           if allPieces[selectedImage][1][0]-50 < x * 100 < allPieces[selectedImage][1][0] + 50:
-                              if TableroDeAjedres.CasillasDeJuego[sx/100, sy/100].pieceOnTile.MoviemientoValido([x, y],TableroDeAjedres.CasillasDeJuego ):
+                              if TableroDeAjedres.CasillasDeJuego[sx/100, sy/100].pieceOnTile.MoviemientoValido([x, y],TableroDeAjedres.CasillasDeJuego):
                                 if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() != "-":
+
                                     if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "R" or TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "r":
                                         FlagEndGame = True
                                         #agregar flag de jaque
                                     for i in range(len(allPieces)):
-                                        if allPieces[i][1][0] == x*100 and allPieces[i][1][1] == y*100:
-                                            print("BOrrado")
+                                        if allPieces[i][1][0] == x*100 and allPieces[i][1][1] == y*100:#revisar que el bug puede estar porque el valor de las allpieces no esta en base 10
                                             allPieces.pop(i)
                                             img = pygame.image.load("./Imagenes/Transparente.png")
                                             allPieces.insert(i,[None, [x*100,y*100], Nopieza()])
@@ -143,16 +144,25 @@ while not quitGame:
 
                                 TableroDeAjedres.CasillasDeJuego[sx / 100, sy / 100].pieceOnTile = Nopieza()
                                 #TableroDeAjedres.CasillasDeJuego[sx / 100, sy / 100].position = [x, y]
-
-
+                                if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "p" or TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "P":
+                                    TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.Coronar([x, y],TableroDeAjedres.CasillasDeJuego, allPieces)
+                                if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "r" or TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.toString() == "R":
+                                    TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.ActualizarTorre([x, y], allPieces)
                                 flag = 1
-                                print("hola", x, y)
                                 TableroDeAjedres.ImpimirTablero()
                                 if Turno == "Negra":
                                     Turno = "Blanca"
                                 else:
                                     Turno = "Negra"
+                                for xJ in range(8):
+                                    for yJ in range(8):
+                                       if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.MoviemientoValido([xJ, yJ],TableroDeAjedres.CasillasDeJuego):
+                                            if TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.alliance == "Negra" and TableroDeAjedres.CasillasDeJuego[xJ, yJ].pieceOnTile.toString() == "r":
+                                                jaque = True
+                                            elif TableroDeAjedres.CasillasDeJuego[x, y].pieceOnTile.alliance == "Blanca" and TableroDeAjedres.CasillasDeJuego[xJ, yJ].pieceOnTile.toString() == "R":
+                                                jaque = True
                                 break;
+
               if flag == 0:
                 #print(TableroDeAjedres.CasillasDeJuego[sx/100, sy/100].pieceOnTile.position,TableroDeAjedres.CasillasDeJuego[x,y].pieceOnTile.position)
                 allPieces[selectedImage][1][0] = sx
@@ -163,13 +173,22 @@ while not quitGame:
 
 
             selectedImage = None
+    if jaque:
+        if MoveDone == 2:
+            MoveDone = 0
+            Tk().wm_withdraw()
+            messagebox.showinfo("Jaque", "Su pieza a sido puesta en jaque, muevela o perdera")
+            jaque = False
+
+        else:
+            MoveDone += 1
 
     if FlagEndGame:
         if MoveDone == 2:
+            MoveDone = 0
             Tk().wm_withdraw()
             Reiniciar = messagebox.askyesno("Perdio", "Desea Reiniciar el Juego")
 
-            print("HOLA")
             if Reiniciar:
                     Reiniciar = False
                     for i in range(len(allPieces)):
@@ -179,6 +198,7 @@ while not quitGame:
                     TableroDeAjedres.ImpimirTablero()
                     drawChessPieces()
                     FlagEndGame = False
+                    Turno = "Blanca"
             else:
                 quitGame = True
                 pygame.quit()
