@@ -13,6 +13,7 @@ class Pieza:
     def MoviemientoValido(self, position, pieza):
         return False
     def PiezaA(self, piezas, position):
+        self.NoPieza = False
         Flag = True
         FlagF = True
         finalx, finaly = position
@@ -31,7 +32,6 @@ class Pieza:
             neg = -1
             y = 1
         if len(distancex) != len(distancey):
-            self.NoPieza = False
             return self.NoPieza
         for x in distancex:
             #salto un bug de fuera de rango
@@ -49,7 +49,8 @@ class Pieza:
             y += 1
         return self.NoPieza
     def PiezaT(self, piezas, position):
-        Flagx, Flagy =  True, True
+        self.NoPiezax, self.NoPiezay = False, False
+        Flagx, Flagy = True, True
         finalx, finaly = position
         if self.position[0] < position[0]:
             distancex = range(int(self.position[0])+1, int(position[0])+1)
@@ -60,7 +61,6 @@ class Pieza:
         else:
             distancey = range(int(position[1]), int(self.position[1]))
         for x in distancex:
-            print(x)
             if piezas[x,self.position[1]].pieceOnTile.toString() != "-":
                 self.xNoPieza = False
                 if piezas[x, self.position[1]].pieceOnTile.alliance != self.alliance and finalx == x and Flagx:
@@ -70,7 +70,6 @@ class Pieza:
             elif Flagx:
                 self.xNoPieza = True
         for y in distancey:
-            print(y)
             if piezas[self.position[0], y].pieceOnTile.toString() != "-":
                 self.yNoPieza = False
                 if piezas[self.position[0], y].pieceOnTile.alliance != self.alliance and finaly == y and Flagy:

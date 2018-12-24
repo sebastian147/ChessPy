@@ -36,6 +36,7 @@ class Peon (Pieza):
         if(self.position == position):
             self.valido = False
         elif abs(self.position[0] - position[0]) == 1 and self.position[1] - position[1] == dist1 and (self.xNoPieza or self.yNoPieza) and self.NoPieza:
+            self.FlagNoMove = False
             self.valido = True
             return self.valido
         else:
@@ -76,7 +77,7 @@ class Peon (Pieza):
             return False
 
     def PiezaA(self, piezas, position):
-        finalx, finaly = position
+        self.Nopieza = False
         if self.position[0] < position[0]:
             distancex = range(int(self.position[0]+1), int(position[0])+1)
         else:
@@ -92,17 +93,12 @@ class Peon (Pieza):
             neg = -1
             y = 1
         if len(distancex) != len(distancey):
-            self.NoPieza = False
             return self.NoPieza
+        if piezas[position[0], position[1]].pieceOnTile.toString() != "-":
+            self.NoPieza = False
+            if piezas[position[0], position[1]].pieceOnTile.alliance != self.alliance:
 
-        for x in distancex:
-            print(x, distancey[neg*y])
-            if piezas[x, distancey[neg*y]].pieceOnTile.toString() != "-":
-                self.NoPieza = False
-                if piezas[x, distancey[neg*y]].pieceOnTile.alliance != self.alliance and (finalx == x or distancey[neg*y] == finaly):
-                    self.NoPieza = True
-            y += 1
+                self.NoPieza = True
         return self.NoPieza
-
 
     ##falta movimiento raro
