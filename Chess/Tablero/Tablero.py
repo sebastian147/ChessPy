@@ -11,10 +11,11 @@ from Piezas.Torre import Torre
 class Tablero:
 
     CasillasDeJuego = {}
-
+    TableroDeAjedres = None
     def __init__(self):
 
-        pass ##??
+        self.CrearTablero()
+        self.ImpimirTablero()
 
     def CrearTablero(self):
         for y in range(8):

@@ -10,7 +10,6 @@ class Alfil (Pieza):
 
     def MoviemientoValido(self, position, piezas):
         self.NoPieza = self.PiezaA(piezas, position)
-        print(self.NoPieza)
         if(self.position == position):
             self.valido = False
         elif abs(self.position[0] - position[0]) == abs(self.position[1] + position[1]) and self.NoPieza:
